@@ -352,9 +352,9 @@ def generate_order_number(client_id):
     conn = get_db_connection()
     latest = conn.execute(text("""
         SELECT order_number FROM orders
-        WHERE order_number LIKE ?
+        WHERE order_number LIKE :pattern
         ORDER BY order_number DESC LIMIT 1
-    """), (like_pattern,)).fetchone()
+    """), {"pattern": like_pattern}).fetchone()
     conn.close()
 
     if latest:
