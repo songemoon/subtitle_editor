@@ -332,15 +332,21 @@ def update_order_status():
     field = data.get("field")
     value = data.get("value")
 
-    if field not in ["delivered", "revision_requested", "revision_completed", "settlement_completed"]:
+    allowed_fields = ["delivered", "revision_requested", "revision_completed", "settlement_completed"]
+    if field not in allowed_fields:
         return jsonify({"error": "Invalid field"}), 400
 
-    conn = get_db_connection()
-    conn.execute(text(f"UPDATE orders SET {field} = :value WHERE id = :id"), {"value": value, "id": order_id})
-    conn.commit()
-    conn.close()
-
-    return jsonify({"success": True})
+    try:
+        conn = get_db_connection()
+        conn.execute(text(f"UPDATE orders SET {field} = :value WHERE id = :id"), {
+            "value": value,
+            "id": order_id
+        })
+        conn.commit()
+        conn.close()
+        return jsonify({"success": True})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @main_bp.route("/orders/<int:order_id>/translate")
 def translate_order(order_id):
