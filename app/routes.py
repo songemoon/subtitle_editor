@@ -371,7 +371,7 @@ def generate_order_number(client_id):
         SELECT order_number FROM orders
         WHERE order_number LIKE :pattern
         ORDER BY order_number DESC LIMIT 1
-    """), {"pattern": like_pattern}).fetchone()
+    """), {"pattern": like_pattern}).mappings().fetchone()
     conn.close()
 
     if latest:
