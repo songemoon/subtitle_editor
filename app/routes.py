@@ -33,7 +33,10 @@ def upload_file():
         return "order_id가 누락되었습니다."
 
     conn = get_db_connection()
-    order = conn.execute(text("SELECT order_number FROM orders WHERE id = ?"), (order_id,)).fetchone()
+    order = conn.execute(
+        text("SELECT order_number FROM orders WHERE id = :id"),
+        {"id": order_id}
+    ).fetchone()
     conn.close()
     if not order:
         return "해당 주문을 찾을 수 없습니다."
@@ -278,8 +281,21 @@ def add_order():
             INSERT INTO orders (
                 client_id, video_link, rate_per_minute, video_length,
                 price, deadline, settlement_due, order_number
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        """), (client_id, video_link, rate, video_length, price, deadline, settlement_due, order_number))
+            ) VALUES (
+                :client_id, :video_link, :rate_per_minute, :video_length,
+                :price, :deadline, :settlement_due, :order_number
+            )
+        """), {
+            "client_id": client_id,
+            "video_link": video_link,
+            "rate_per_minute": rate,
+            "video_length": video_length,
+            "price": price,
+            "deadline": deadline,
+            "settlement_due": settlement_due,
+            "order_number": order_number
+        })
+
         conn.commit()
         conn.close()
         return redirect(url_for("main.view_orders"))
@@ -333,8 +349,9 @@ def translate_order(order_id):
         SELECT o.*, c.name AS client_name
         FROM orders o
         JOIN clients c ON o.client_id = c.id
-        WHERE o.id = ?
-    """), (order_id,)).fetchone()
+        WHERE o.id = :id
+    """), {"id": order_id}).fetchone()
+
     clients = conn.execute(text("SELECT * FROM clients")).fetchall()
     conn.close()
 
@@ -369,7 +386,10 @@ def generate_order_number(client_id):
 @main_bp.route("/orders/<int:order_id>/handle")
 def handle_order_click(order_id):
     conn = get_db_connection()
-    order = conn.execute(text("SELECT order_number FROM orders WHERE id = ?"), (order_id,)).fetchone()
+    order = conn.execute(
+        text("SELECT order_number FROM orders WHERE id = :id"),
+        {"id": order_id}
+    ).fetchone()
     conn.close()
 
     if not order:
