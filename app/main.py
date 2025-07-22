@@ -52,7 +52,7 @@ def translate_sentences(sentences, client_id=None, target_lang="English"):
         glossary = conn.execute(
             text("SELECT korean, english FROM glossaries WHERE client_id = :client_id"),
             {"client_id": client_id}
-        ).fetchall()
+        ).mappings().fetchall()
         conn.close()
 
         if glossary:

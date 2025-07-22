@@ -69,6 +69,8 @@ def upload_file():
 @main_bp.route("/translate", methods=["POST"])
 def translate_uploaded_file():
     client_id = request.form.get("client_id")
+    if client_id:
+        client_id = int(client_id)
     filename = request.form.get("filename")
     filepath = os.path.join("uploads", filename)
 
