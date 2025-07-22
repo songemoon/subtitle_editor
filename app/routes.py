@@ -10,20 +10,6 @@ main_bp = Blueprint("main", __name__)
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-def extract_sentences_from_srt(srt_text):
-    lines = srt_text.splitlines()
-    sentences = []
-    for line in lines:
-        line = line.strip()
-        if line and not line.isdigit() and "-->" not in line:
-            parts = line.split(".")
-            for p in parts:
-                clean = p.strip()
-                if clean:
-                    sentences.append(clean + ".")
-    return sentences
-
-
 @main_bp.route("/")
 def home():
     return render_template("home.html")
@@ -101,8 +87,9 @@ def translate_uploaded_file():
         s['start_formatted'] = format_time(start_sec)
         s['end_formatted'] = format_time(end_sec)
 
-    sentences = extract_sentences_from_srt(srt_content)
+    sentences = [s["text"] for s in subtitles]
     translated = translate_sentences(sentences, client_id=client_id)
+
 
     return render_template("edit.html", zipped=zip(subtitles, translated), filename=filename)
 
