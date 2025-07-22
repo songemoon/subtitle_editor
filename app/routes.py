@@ -271,7 +271,7 @@ def manage_glossary(client_id):
         conn.commit()
 
     glossary = conn.execute(
-        text("SELECT * FROM glossaries WHERE client_id = :client_id"),
+        text("SELECT korean, english FROM glossaries WHERE client_id = :client_id"),
         {"client_id": client_id}
     ).fetchall()
 
