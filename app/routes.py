@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, send_from_directory, jsonify
 from sqlalchemy import text
 import os
-from .main import translate_text, parse_srt, extract_sentences_from_srt, translate_sentences, rebuild_srt
+from .main import translate_text, parse_srt, translate_sentences, rebuild_srt
 from app.db import get_db_connection
 from datetime import datetime
 
@@ -9,6 +9,20 @@ main_bp = Blueprint("main", __name__)
 
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+def extract_sentences_from_srt(srt_text):
+    lines = srt_text.splitlines()
+    sentences = []
+    for line in lines:
+        line = line.strip()
+        if line and not line.isdigit() and "-->" not in line:
+            parts = line.split(".")
+            for p in parts:
+                clean = p.strip()
+                if clean:
+                    sentences.append(clean + ".")
+    return sentences
+
 
 @main_bp.route("/")
 def home():
