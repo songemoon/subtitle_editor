@@ -4,4 +4,5 @@ psycopg-binary==3.2.9
 python-dotenv==1.1.1
 flask
 gunicorn
-openainltk
+openai
+nltk
