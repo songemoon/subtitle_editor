@@ -389,7 +389,8 @@ def handle_order_click(order_id):
     order = conn.execute(
         text("SELECT order_number FROM orders WHERE id = :id"),
         {"id": order_id}
-    ).fetchone()
+    ).mappings().fetchone()
+
     conn.close()
 
     if not order:
