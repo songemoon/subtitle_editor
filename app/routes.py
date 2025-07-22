@@ -246,15 +246,15 @@ def manage_glossary(client_id):
         english = request.form.get("english")
 
         conn.execute(
-            text("INSERT INTO glossaries (client_id, korean, english) VALUES (?, ?, ?)"),
-            (client_id, korean, english)
+            text("INSERT INTO glossaries (client_id, korean, english) VALUES (:client_id, :korean, :english)"),
+            {"client_id": client_id, "korean": korean, "english": english}
         )
         conn.commit()
 
     glossary = conn.execute(
-        text("SELECT * FROM glossaries WHERE client_id = ?"), (client_id,)
+        text("SELECT * FROM glossaries WHERE client_id = :client_id"),
+        {"client_id": client_id}
     ).fetchall()
-    conn.close()
 
     return render_template("glossary.html", glossary=glossary, client_id=client_id)
 
