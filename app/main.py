@@ -5,6 +5,7 @@ import nltk
 nltk.download('punkt')
 from nltk.tokenize import sent_tokenize
 import re
+from sqlalchemy import text
 
 load_dotenv()
 
@@ -49,7 +50,8 @@ def translate_sentences(sentences, client_id=None, target_lang="English"):
     if client_id:
         conn = get_db_connection()
         glossary = conn.execute(
-            "SELECT korean, english FROM glossaries WHERE client_id = ?", (client_id,)
+            text("SELECT korean, english FROM glossaries WHERE client_id = :client_id"),
+            {"client_id": client_id}
         ).fetchall()
         conn.close()
 
