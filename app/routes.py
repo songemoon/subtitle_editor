@@ -316,8 +316,8 @@ def view_orders():
     conn.close()
 
     orders = []
-    for order in raw_orders:
-        order = dict(order)
+    for row in raw_orders:
+        order = dict(row._mapping)  # SQLAlchemy 2.x 안전한 방식
         edited_filename = f"edited_{order['order_number']}.srt"
         edited_path = os.path.join("uploads", edited_filename)
         order["edited_srt_exists"] = os.path.exists(edited_path)
