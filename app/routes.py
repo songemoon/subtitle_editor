@@ -36,14 +36,16 @@ def upload_file():
     order = conn.execute(
         text("SELECT order_number FROM orders WHERE id = :id"),
         {"id": order_id}
-    ).fetchone()
+    ).mappings().fetchone()  # ✅ 수정된 부분
     conn.close()
+
     if not order:
         return "해당 주문을 찾을 수 없습니다."
 
     order_number = order["order_number"]
     filename = f"{order_number}.srt"
     filepath = os.path.join(UPLOAD_FOLDER, filename)
+
     if os.path.exists(filepath):
         return redirect(url_for("main.edit_translation", order_id=order_id))
 
