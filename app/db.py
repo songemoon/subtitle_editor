@@ -10,7 +10,7 @@ def get_db_connection():
     return engine.connect()
 
 def init_db():
-    with engine.connect() as conn:
+    with engine.begin() as conn:
         conn.execute(text("""
             CREATE TABLE IF NOT EXISTS clients (
                 id SERIAL PRIMARY KEY,
@@ -51,7 +51,3 @@ def init_db():
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
         """))
-
-
-    conn.commit()
-    conn.close()
