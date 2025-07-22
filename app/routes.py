@@ -114,7 +114,10 @@ def download_file(filename):
 @main_bp.route("/orders/<int:order_id>/edit")
 def edit_translation(order_id):
     conn = get_db_connection()
-    order = conn.execute(text("SELECT order_number, client_id FROM orders WHERE id = ?"), (order_id,)).fetchone()
+    order = conn.execute(
+        text("SELECT order_number, client_id FROM orders WHERE id = :id"),
+        {"id": order_id}
+    ).mappings().fetchone()
     conn.close()
 
     if not order:
