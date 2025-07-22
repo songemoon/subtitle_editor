@@ -1,7 +1,7 @@
 git-filter-repo==2.47.0
 psycopg==3.2.9
 sqlalchemy
-psycopg-binary==3.2.9
+psycopg2-binary
 python-dotenv==1.1.1
 flask
 gunicorn
