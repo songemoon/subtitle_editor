@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}번역 시작 - {{ filename }}{% endblock %}
+
+{% block content %}
+  <h1>📁 {{ filename }} 업로드 완료</h1>
+
+  <form action="{{ url_for('main.translate_uploaded_file') }}" method="post" style="margin-top: 20px;">
+    <input type="hidden" name="client_id" value="{{ client_id }}">
+    <input type="hidden" name="filename" value="{{ filename }}">
+
+    <button type="submit" style="
+      background-color: #ff87a1;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 12px;
+      font-weight: bold;
+      cursor: pointer;
+    ">
+      🌐 이 파일 번역하기
+    </button>
+  </form>
+{% endblock %}

@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}📝 번역 자막 수정{% endblock %}
+
+{% block content %}
+<h2>📝 번역 자막 수정</h2>
+
+<style>
+.card-container {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.subtitle-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #fff0f5;
+  border-radius: 16px;
+  padding: 14px 20px;
+  box-shadow: 0 2px 6px rgba(255, 120, 180, 0.15);
+  border: 1.5px solid #ffcde4;
+  flex-wrap: wrap;
+}
+
+.info-block {
+  flex: 1 1 35%;
+  min-width: 200px;
+}
+
+.timecode {
+  font-size: 0.85rem;
+  color: #888;
+  margin-bottom: 4px;
+}
+
+.original-text {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+  word-break: break-word;
+}
+
+.translation-block {
+  flex: 1 1 60%;
+  min-width: 250px;
+}
+
+.translation-input {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 1rem;
+  border: 1.8px solid #ff9ccf;
+  border-radius: 10px;
+  box-sizing: border-box;
+}
+
+.translation-input:focus {
+  outline: none;
+  border-color: #ff4c8b;
+  box-shadow: 0 0 6px #ff4c8b;
+}
+
+.btn {
+  background-color: #ff4c8b;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 20px;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
+  margin: 0 10px;
+  transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+  background-color: #e0437f;
+}
+</style>
+
+<form action="{{ url_for('main.save_edited') }}" method="POST">
+  <input type="hidden" name="filename" value="{{ filename }}">
+
+  <div class="card-container">
+    {% for s, t in zipped %}
+    <div class="subtitle-card">
+      <div class="info-block">
+        <div class="timecode">{{ s.timestamp }}</div>
+        <div class="original-text">{{ s.text }}</div>
+      </div>
+      <div class="translation-block">
+        <input type="text" name="translation_{{ loop.index0 }}" value="{{ t }}" class="translation-input" />
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div style="margin-top: 30px; text-align: center;">
+    <button type="button" class="btn" onclick="saveDraft()">📥 저장하기</button>
+    <button type="submit" class="btn">💾 저장하고 다운로드</button>
+  </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function saveDraft() {
+  const form = document.querySelector("form");
+  form.action = "{{ url_for('main.save_draft') }}";
+  form.submit();
+}
+</script>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}👤 클라이언트 추가{% endblock %}
+
+{% block content %}
+<h2>👤 클라이언트 추가</h2>
+
+<form method="post" style="max-width: 500px; background: #fff; padding: 30px; border-radius: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+  <div style="margin-bottom: 20px;">
+    <label for="name" style="display: block; font-weight: bold; margin-bottom: 5px;">이름</label>
+    <input type="text" name="name" id="name" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 10px;" />
+  </div>
+
+  <div style="margin-bottom: 20px;">
+    <label for="channel" style="display: block; font-weight: bold; margin-bottom: 5px;">채널명</label>
+    <input type="text" name="channel" id="channel" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 10px;" />
+  </div>
+
+  <div style="margin-bottom: 20px;">
+    <label for="channel_link" style="display: block; font-weight: bold; margin-bottom: 5px;">채널링크</label>
+    <input type="text" name="channel_link" id="channel_link" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 10px;" />
+  </div>
+
+  <div style="margin-bottom: 20px;">
+    <label for="others" style="display: block; font-weight: bold; margin-bottom: 5px;">특이사항</label>
+    <input type="text" name="others" id="others" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 10px;" />
+  </div>
+
+  <button type="submit" class="btn">💾 추가하기</button>
+</form>
+
+<p style="margin-top: 20px;">
+  <a href="{{ url_for('main.client_list') }}">← 목록으로 돌아가기</a>
+</p>
+{% endblock %}

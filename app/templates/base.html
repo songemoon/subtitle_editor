@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>{% block title %}번역 시스템{% endblock %}</title>
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/jquery.dataTables.min.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', 'Apple SD Gothic Neo', sans-serif;
+      background-color: #fff0f5;
+      color: #333;
+    }
+
+    .navbar {
+      background-color: #ffb6c1;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 3px solid #f8a5c2;
+      border-radius: 0 0 20px 20px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .nav-left {
+      display: flex;
+      gap: 20px;
+    }
+
+    .navbar a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 16px;
+      background-color: #f78fb3;
+      padding: 8px 15px;
+      border-radius: 999px;
+      transition: background-color 0.3s ease;
+    }
+
+    .navbar a:hover {
+      background-color: #f38aa2;
+    }
+
+    .nav-right {
+      font-weight: bold;
+      font-size: 16px;
+      color: white;
+      white-space: nowrap;
+    }
+
+    .container {
+      padding: 30px;
+    }
+
+    h1, h2, h3 {
+      color: #d63384;
+    }
+
+    table {
+      border-radius: 15px;
+      overflow: hidden;
+    }
+
+    table.dataTable thead {
+      background-color: #ffe3ec;
+    }
+
+    input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+    }
+
+    .btn {
+      background-color: #ffb6c1;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .btn:hover {
+      background-color: #ff8fa3;
+    }
+
+    div.dataTables_filter {
+        margin-bottom: 20px;
+    }
+
+    div.dataTables_filter label {
+        font-weight: bold;
+        color: #333;
+    }
+
+    div.dataTables_filter input {
+        padding: 8px 14px;
+        border: 1px solid #ffc0cb;
+        border-radius: 15px;
+        background-color: #fff0f5;
+        color: #333;
+        outline: none;
+        transition: border 0.3s ease;
+        margin-left: 10px;
+    }
+
+    div.dataTables_filter input:focus {
+        border-color: #ff99b3;
+        background-color: #ffe6f0;
+    }
+  </style>
+  {% block head_extra %}{% endblock %}
+</head>
+<body>
+  <div class="navbar">
+    <div class="nav-left">
+      <a href="{{ url_for('main.home') }}">🤗 메인화면</a>
+      <a href="{{ url_for('main.client_list') }}">🎀 고객리스트</a>
+      <a href="{{ url_for('main.add_client') }}">💖 고객등록</a>
+      <a href="{{ url_for('main.manage_glossary', client_id=1) }}">🌸 단어장등록</a>
+      <a href="{{ url_for('main.add_order') }}">🌺 의뢰등록</a>
+      <a href="{{ url_for('main.view_orders') }}">🍒 의뢰리스트</a>
+    </div>
+    <div class="nav-right">
+      💕 달똥이의 번역기
+    </div>
+  </div>
+
+  <div class="container">
+    {% block content %}{% endblock %}
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

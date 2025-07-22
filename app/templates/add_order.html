@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}📝 의뢰 등록{% endblock %}
+
+{% block content %}
+<h2>📝 의뢰 등록</h2>
+
+<form method="POST" style="max-width: 600px; background: #fff; padding: 30px; border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 30px;">
+  <div style="margin-bottom: 20px;">
+    <label for="client_id" style="display: block; font-weight: bold; margin-bottom: 5px;">클라이언트</label>
+    <select name="client_id" id="client_id" required style="width: 100%; padding: 10px; border: 1px solid #ffc0cb; border-radius: 10px; background: #fff0f5;">
+      {% for client in clients %}
+      <option value="{{ client.id }}">{{ client.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div style="margin-bottom: 20px;">
+    <label for="video_link" style="display: block; font-weight: bold; margin-bottom: 5px;">영상 링크</label>
+    <input type="text" name="video_link" id="video_link" required style="width: 100%; padding: 10px; border: 1px solid #ffc0cb; border-radius: 10px;" />
+  </div>
+
+  <div style="margin-bottom: 20px;">
+    <label for="rate" style="display: block; font-weight: bold; margin-bottom: 5px;">단가 (₩/분)</label>
+    <input type="number" name="rate_per_minute" id="rate" required style="width: 100%; padding: 10px; border: 1px solid #ffc0cb; border-radius: 10px;" />
+  </div>
+
+  <div style="margin-bottom: 20px;">
+    <label for="video_length" style="display: block; font-weight: bold; margin-bottom: 5px;">영상 길이 (HH:MM:SS)</label>
+    <input type="text" name="video_length" id="video_length" placeholder="예: 00:12:30" required style="width: 100%; padding: 10px; border: 1px solid #ffc0cb; border-radius: 10px;" />
+  </div>
+
+  <div style="margin-bottom: 20px;">
+    <label style="display: block; font-weight: bold; margin-bottom: 5px;">💰 예상 가격</label>
+    <div id="price_display" style="padding: 10px; background: #ffeef3; border-radius: 10px; font-weight: bold; color: #d6336c;">₩0</div>
+  </div>
+
+  <div style="margin-bottom: 20px;">
+    <label for="deadline" style="display: block; font-weight: bold; margin-bottom: 5px;">마감일</label>
+    <input type="datetime-local" name="deadline" id="deadline" required style="width: 100%; padding: 10px; border: 1px solid #ffc0cb; border-radius: 10px;" />
+  </div>
+
+  <div style="margin-bottom: 20px;">
+    <label for="settlement_due" style="display: block; font-weight: bold; margin-bottom: 5px;">정산 예정일</label>
+    <input type="date" name="settlement_due" id="settlement_due" style="width: 100%; padding: 10px; border: 1px solid #ffc0cb; border-radius: 10px;" />
+  </div>
+
+  <button type="submit" class="btn">📝 등록</button>
+</form>
+
+<script>
+  const rateInput = document.getElementById("rate");
+  const lengthInput = document.getElementById("video_length");
+  const priceDisplay = document.getElementById("price_display");
+
+  function updatePrice() {
+    const rate = parseFloat(rateInput.value || 0);
+    const [h, m, s] = (lengthInput.value || "0:0:0").split(":").map(Number);
+    const totalMinutes = h * 60 + m + s / 60;
+    const price = Math.round(totalMinutes * rate);
+    priceDisplay.innerText = `₩${price.toLocaleString()}`;
+  }
+
+  rateInput.addEventListener("input", updatePrice);
+  lengthInput.addEventListener("input", updatePrice);
+</script>
+{% endblock %}

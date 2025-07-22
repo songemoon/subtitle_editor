@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+
+{% block title %}📋 의뢰 목록{% endblock %}
+
+{% block content %}
+<h2>📋 의뢰 목록</h2>
+
+<div id="filterContainer" style="margin-bottom: 10px;">
+  <label><input type="checkbox" id="filterUndelivered"> 미납품</label>
+  <label><input type="checkbox" id="filterRevisionRequested"> 수정중</label>
+  <label><input type="checkbox" id="filterUnsettled"> 미정산</label>
+</div>
+
+<table id="ordersTable" class="pretty-table" cellspacing="0" cellpadding="5">
+  <thead>
+    <tr>
+      <th>발주번호</th>
+      <th>클라이언트</th>
+      <th>영상링크</th>
+      <th>단가</th>
+      <th>길이</th>
+      <th>가격</th>
+      <th>마감일</th>
+      <th>남은시간</th>
+      <th>납품</th>
+      <th>수정중</th>
+      <th>수정완료</th>
+      <th>정산예정</th>
+      <th>정산완료</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for order in orders %}
+      {% set row_class = "" %}
+      {% if order.settlement_completed %}
+        {% set row_class = "gray" %}
+      {% elif order.revision_requested %}
+        {% set row_class = "yellow" %}
+      {% elif order.delivered %}
+        {% set row_class = "white" %}
+      {% else %}
+        {% set row_class = "red" %}
+      {% endif %}
+      <tr class="{{ row_class }}">
+        <td>
+          <a href="{{ url_for('main.handle_order_click', order_id=order.id) }}">{{ order.order_number }}</a>
+        </td>
+        <td>{{ order.client_name }}</td>
+        <td><a href="{{ order.video_link }}" target="_blank">영상</a></td>
+        <td>₩{{ order.rate_per_minute }}</td>
+        <td>{{ order.video_length }}</td>
+        <td>₩{{ "{:,}".format(order.price) }}</td>
+        <td>{{ order.deadline.replace("T", " ") }}</td>  {# 표시용만 공백, 아래 data-deadline은 원본 #}
+        <td><span class="countdown" data-deadline="{{ order.deadline }}"></span></td>
+        <td><input type="checkbox" class="status-toggle" data-order-id="{{ order.id }}" data-field="delivered" {% if order.delivered %}checked{% endif %}></td>
+        <td><input type="checkbox" class="status-toggle" data-order-id="{{ order.id }}" data-field="revision_requested" {% if order.revision_requested %}checked{% endif %}></td>
+        <td><input type="checkbox" class="status-toggle" data-order-id="{{ order.id }}" data-field="revision_completed" {% if order.revision_completed %}checked{% endif %}></td>
+        <td>{{ order.settlement_due }}</td>
+        <td><input type="checkbox" class="status-toggle" data-order-id="{{ order.id }}" data-field="settlement_completed" {% if order.settlement_completed %}checked{% endif %}></td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<style>
+  .pretty-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  }
+  .pretty-table thead {
+    background-color: #ffc0cb;
+    color: #333;
+  }
+  .pretty-table th, .pretty-table td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+  }
+  .pretty-table tr:hover {
+    background-color: #fff0f5;
+  }
+
+  .pretty-table tr.gray   { background-color: #e0e0e0 !important; }
+  .pretty-table tr.yellow { background-color: #fff8cc !important; }
+  .pretty-table tr.white  { background-color: #ffffff !important; }
+  .pretty-table tr.red    { background-color: #ffe6e6 !important; }
+  .pretty-table tr.urgent { background-color: #ffc2c2 !important; }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function updateRowColor(row, isUrgent) {
+    const delivered = row.querySelector('input[data-field="delivered"]').checked;
+    const revisionRequested = row.querySelector('input[data-field="revision_requested"]').checked;
+    const revisionCompleted = row.querySelector('input[data-field="revision_completed"]').checked;
+    const settlementCompleted = row.querySelector('input[data-field="settlement_completed"]').checked;
+
+    row.classList.remove("gray","yellow","white","red","urgent");
+
+    if (settlementCompleted) {
+      row.classList.add("gray");
+    } else if (revisionRequested) {
+      row.classList.add("yellow");
+    } else if (revisionCompleted || delivered) {
+      row.classList.add("white");
+    } else if (isUrgent) {
+      row.classList.add("urgent");
+    } else {
+      row.classList.add("red");
+    }
+  }
+
+  function updateCountdowns() {
+    const now = new Date();
+    document.querySelectorAll('#ordersTable tbody tr').forEach(row => {
+      const span = row.querySelector('.countdown');
+      if (!span) return;
+
+      // ISO 파싱 안정화: 공백 들어온 경우 T로 교체
+      const raw = span.dataset.deadline;
+      const deadline = new Date(raw.includes('T') ? raw : raw.replace(' ', 'T'));
+
+      const delivered = row.querySelector('input[data-field="delivered"]').checked;
+      const diffMs = deadline - now;
+      if (isNaN(diffMs)) {
+        span.innerText = "시간 오류";
+        updateRowColor(row, false);
+        return;
+      }
+
+      if (diffMs <= 0) {
+        span.innerText = "마감 지남";
+        updateRowColor(row, !delivered); 
+        return;
+      }
+
+      const hours = Math.floor(diffMs / 3600000);
+      const minutes = Math.floor((diffMs % 3600000) / 60000);
+      span.innerText = `${hours}시간 ${minutes}분`;
+
+      const isUrgent = hours < 6 && !delivered;
+      updateRowColor(row, isUrgent);
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const table = $('#ordersTable').DataTable({
+      pageLength: 20,
+      lengthChange: false,
+      language: {
+        search: "검색:",
+        paginate: { previous: "이전", next: "다음", first: "처음", last: "마지막" },
+        info: "_TOTAL_개 중 _START_~_END_ 표시",
+        infoEmpty: "데이터가 없습니다",
+        zeroRecords: "검색 결과가 없습니다"
+      },
+      order: [[0, "desc"]]
+    });
+
+    // 필터 로직
+    $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+      const row = table.row(dataIndex).node();
+      const undelivered = $('#filterUndelivered').prop('checked');
+      const revision = $('#filterRevisionRequested').prop('checked');
+      const unsettled = $('#filterUnsettled').prop('checked');
+
+      const delivered = $(row).find('input[data-field="delivered"]').prop('checked');
+      const revisionRequested = $(row).find('input[data-field="revision_requested"]').prop('checked');
+      const settlementCompleted = $(row).find('input[data-field="settlement_completed"]').prop('checked');
+
+      if (undelivered && delivered) return false;
+      if (revision && !revisionRequested) return false;
+      if (unsettled && settlementCompleted) return false;
+      return true;
+    });
+
+    $('#filterUndelivered, #filterRevisionRequested, #filterUnsettled').on('change', function () {
+      table.draw();
+    });
+
+    // 상태 변경 처리
+    document.querySelectorAll(".status-toggle").forEach(cb => {
+      cb.addEventListener("change", () => {
+        const row = cb.closest("tr");
+        const orderId = cb.dataset.orderId;
+        const field = cb.dataset.field;
+        const value = cb.checked ? 1 : 0;
+
+        fetch("/orders/update_status", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ order_id: orderId, field: field, value: value })
+        }).then(res => {
+          if (!res.ok) {
+            alert("업데이트 실패!");
+            return;
+          }
+
+          // revision_completed → revision_requested 해제
+          if (field === "revision_completed" && value === 1) {
+            const revReq = row.querySelector('input[data-field="revision_requested"]');
+            if (revReq && revReq.checked) {
+              revReq.checked = false;
+              fetch("/orders/update_status", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ order_id: orderId, field: "revision_requested", value: 0 })
+              });
+            }
+          }
+
+          // 즉시 색상 갱신
+          updateCountdowns();
+        });
+      });
+    });
+
+    // 초기 적용
+    updateCountdowns();
+    setInterval(updateCountdowns, 60000);
+
+    // DataTables redraw 시 재적용
+    table.on('draw', function () {
+      updateCountdowns();
+    });
+  });
+</script>
+{% endblock %}

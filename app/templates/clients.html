@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}📘 클라이언트 목록{% endblock %}
+
+{% block content %}
+<h2>📘 클라이언트 목록</h2>
+
+<table id="clientTable" class="display" style="width: 100%; border-collapse: collapse; border-radius: 15px; overflow: hidden;">
+  <thead>
+    <tr style="background-color: #ffe3ec;">
+      <th>ID</th>
+      <th>이름</th>
+      <th>채널명</th>
+      <th>채널링크</th>
+      <th>단어장</th>
+      <th>특이사항</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for client in clients %}
+    <tr style="background-color: #fff;">
+      <td>{{ client.id }}</td>
+      <td>{{ client.name }}</td>
+      <td>{{ client.channel }}</td>
+      <td>
+        {% if client.channel_link %}
+          <a href="{{ client.channel_link }}" target="_blank">🔗 이동</a>
+        {% endif %}
+      </td>
+      <td>
+        <a href="{{ url_for('main.manage_glossary', client_id=client.id) }}">📘 단어장</a>
+      </td>
+      <td>{{ client.others }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<p style="margin-top: 20px;">
+  <a href="{{ url_for('main.add_client') }}" class="btn">➕ 새 클라이언트 추가</a>
+</p>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  $(document).ready(function () {
+    $('#clientTable').DataTable({
+      pageLength: 10,
+      lengthChange: false,
+      language: {
+        search: "검색:",
+        paginate: { previous: "이전", next: "다음" },
+        info: "_TOTAL_개 중 _START_~_END_ 표시",
+        infoEmpty: "데이터가 없습니다",
+        zeroRecords: "검색 결과가 없습니다"
+      }
+    });
+  });
+</script>
+{% endblock %}

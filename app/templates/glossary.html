@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}📚 용어집 관리{% endblock %}
+
+{% block content %}
+<h2>📚 클라이언트 {{ client_id }}의 용어집</h2>
+
+<form method="post" style="max-width: 500px; background: #fff; padding: 25px; border-radius: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); margin-bottom: 30px;">
+  <div style="margin-bottom: 15px;">
+    <label for="korean" style="display: block; font-weight: bold; margin-bottom: 5px;">한국어</label>
+    <input type="text" name="korean" id="korean" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 10px;" />
+  </div>
+
+  <div style="margin-bottom: 15px;">
+    <label for="english" style="display: block; font-weight: bold; margin-bottom: 5px;">영어</label>
+    <input type="text" name="english" id="english" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 10px;" />
+  </div>
+
+  <button type="submit" class="btn">➕ 용어 추가</button>
+</form>
+
+<h3>📋 등록된 용어</h3>
+<table style="width: 100%; border-collapse: collapse; background: #fff; border-radius: 15px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.05);">
+  <thead style="background-color: #ffc0cb;">
+    <tr>
+      <th style="padding: 10px;">ID</th>
+      <th style="padding: 10px;">한국어</th>
+      <th style="padding: 10px;">영어</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for entry in glossary %}
+    <tr style="text-align: center; border-top: 1px solid #f2f2f2;">
+      <td style="padding: 10px;">{{ entry.id }}</td>
+      <td style="padding: 10px;">{{ entry.korean }}</td>
+      <td style="padding: 10px;">{{ entry.english }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<p style="margin-top: 20px;">
+  <a href="{{ url_for('main.client_list') }}">← 클라이언트 목록으로</a>
+</p>
+{% endblock %}
