@@ -336,7 +336,7 @@ def update_order_status():
         return jsonify({"error": "Invalid field"}), 400
 
     conn = get_db_connection()
-    conn.execute(text(f"UPDATE orders SET {field} = ? WHERE id = ?"), (value, order_id))
+    conn.execute(text(f"UPDATE orders SET {field} = :value WHERE id = :id"), {"value": value, "id": order_id})
     conn.commit()
     conn.close()
 
